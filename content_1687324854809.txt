@@ -1,0 +1,209 @@
+import java.util.Random;
+import java.util.Scanner;
+class SL{
+    public boolean[][] SCL(int m,int n,int l){
+        Random r = new Random();
+        boolean[][] a = new boolean[m][n];
+        int ml;
+        int nl;
+        for(int i=0;i<l;i++){
+            ml=r.nextInt(m);
+            nl=r.nextInt(n);
+            if(a[ml][nl]){
+                i-=1;
+            }else{
+                a[ml][nl]=true;
+            }
+        }
+        return a;
+    }
+    public int[][] CSH(int m,int n,boolean[][] a){
+        int[][] b=new int[m][n];
+        int[][] c=new int[m+2][n+2];
+        for(int i=1;i<=m;i++){
+            for(int j=1;j<=n;j++){
+                if(a[i-1][j-1]){
+                    for(int ii=-1;ii<=1;ii++){
+                        for(int jj=-1;jj<=1;jj++){
+                            c[i+ii][j+jj]++;
+                        }
+                    }
+                }
+            }
+        }
+        for(int i=1;i<=m;i++){
+            System.arraycopy(c[i], 1, b[i - 1], 0, n);
+        }
+        return b;
+    }
+    public void SC(int m,int n,boolean[][] fk,int[][] tss,boolean[][] wz){
+        for(int i=0;i<n;i++){
+            System.out.print("第"+(n-i)+"行 ");
+            if((n-i)<10){
+                System.out.print(" ");
+            }
+            for(int j=0;j<m;j++){
+                if(wz[j][i]&&fk[j][i]){
+                    System.out.print("! ");
+                }else if(!fk[j][i]){
+                    System.out.print("■ ");
+                }else{
+                    System.out.print(tss[j][i]+" ");
+                }
+            }
+            System.out.println();
+        }
+        System.out.print("      ");
+        for(int i=0;i<m;i++){
+            System.out.print("——");
+        }
+        System.out.println();
+        System.out.print("列数:  ");
+        for(int i=0;i<m;i++){
+            System.out.print((i+1)%10+" ");
+        }
+        System.out.println();
+    }
+    public boolean[][] ZD(int m,int n,int[][] tss,boolean[][] fk){
+        int[][] a=new int[m+2][n+2];
+        boolean[][] b=new boolean[m+2][n+2];
+        for(int i=0;i<=m+1;i++){
+            for(int j=0;j<=n+1;j++){
+                if(i==0||j==0||j==m+1||i==m+1){
+                    a[i][j]=1;
+                }else{
+                    a[i][j]=tss[i-1][j-1];
+                }
+            }
+        }
+        for(int i=1;i<=m;i++){
+            if (n >= 0) System.arraycopy(fk[i - 1], 0, b[i], 1, n);
+        }
+        while(true) {
+            boolean wc=true;
+            for (int i=1;i<=m;i++) {
+                for (int j=1;j<=n;j++) {
+                    if(b[i][j]&&a[i][j]==0){
+                        for(int ii=-1;ii<=1;ii++){
+                            for(int jj=-1;jj<=1;jj++){
+                                if(!b[i+ii][j+jj]) {
+                                    wc=false;
+                                    b[i+ii][j+jj]=true;
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+            if(wc)
+                break;
+        }
+        for(int i=1;i<=m;i++){
+            if (n >= 0) System.arraycopy(b[i], 1, fk[i - 1], 0, n);
+        }
+        return fk;
+    }
+}
+class ZX{
+    public static void main(String[] args){
+        Scanner jk=new Scanner(System.in);
+        boolean next=true;
+        while (next){
+            int m;
+            int n;
+            int l;
+            for(m=0;m<3; ){
+                System.out.print("请输入列数：");
+                m=jk.nextInt();
+                if(m<3)
+                    System.out.print("行列数最小为3，");
+            }
+            for(n=0;n<3; ){
+                System.out.print("请输入行数：");
+                n=jk.nextInt();
+                if(n<3)
+                    System.out.print("行列数最小为3，");
+            }
+            for(l=0;l>=m*n||l<=0; ){
+                System.out.print("请输入雷数：");
+                l=jk.nextInt();
+                if(l>=m*n||l<=0)
+                    System.out.print("雷数需小于行列数的乘集且大于0,");
+            }
+            SL sl=new SL();
+            boolean[][] wz=sl.SCL(m,n,l);
+            int[][] tss=sl.CSH(m,n,wz);
+            boolean[][] fk=new boolean[m][n];
+            for(boolean js=true;js;js=false) {
+                sl.SC(m,n,fk,tss,wz);
+                while(true){
+                    boolean k=false;
+                    int fm=0;
+                    int fn=0;
+                    while (fm>=m+1||fn>=n+1||fm<=0||fn<=0) {
+                        System.out.print("您想要翻开的格子的列数：");
+                        fm=jk.nextInt();
+                        System.out.print("您想要翻开的格子的行数：");
+                        fn=jk.nextInt();
+                        fn=n-fn+1;
+                        if(fm>=m+1||fn>=n+1||fm<=0||fn<=0){
+                            System.out.println("您想要结束这轮游戏吗？【是——1，否——其他数】");
+                            int kl=jk.nextInt();
+                            if(kl!=1){
+                                System.out.println("游戏继续，请重新输入");
+                            }else{
+                                k=true;
+                                break;
+                            }
+                        }
+                        if(fm<m+1&&fn<n+1&&fm>0&&fn>0&&fk[fm-1][fn-1]){
+                            System.out.println("已翻开，请重新输入");
+                            fm=0;
+                            fn=0;
+                        }
+                    }
+                    if(k){
+                        break;
+                    }
+                    fk[fm-1][fn-1]=true;
+                    if(wz[fm-1][fn-1]){
+                        for(int i=0;i<m;i++){
+                            for (int j=0;j<n;j++){
+                                fk[i][j]=true;
+                            }
+                        }
+                        sl.SC(m,n,fk,tss,wz);
+                        System.out.println("很遗憾，游戏结束，菜逼");
+                        break;
+                    }
+                    if(tss[fm-1][fn-1]==0)
+                        fk=sl.ZD(m,n,tss,fk);
+                    sl.SC(m,n,fk,tss,wz);
+                    int fks=0;
+                    for(int i=0;i<m;i++){
+                        for (int j=0;j<n;j++){
+                            if(fk[i][j])
+                                fks++;
+                        }
+                    }
+                    if(fks==n*m-l){
+                        System.out.println("恭喜，排雷成功");
+                        break;
+                    }else{
+                        System.out.println("您还需要排查"+(n*m-l-fks)+"个格子");
+                    }
+                }
+                System.out.println("是否再来一把？【是——1，否——其他数】");
+                int kl=jk.nextInt();
+                if(kl==1){
+                    System.out.println("游戏已重开");
+                }else{
+                    System.out.println("模拟结束");
+                    next=false;
+                    break;
+                }
+            }
+        }
+    }
+}
